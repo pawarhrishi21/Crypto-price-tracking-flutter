@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'coin_data.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -6,11 +9,59 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  Widget getAndroidDropdown() {
+    List<DropdownMenuItem<String>> dropDownItems = [];
+    // String item;
+    for (var item in currenciesList) {
+      dropDownItems.add(
+        DropdownMenuItem(
+          child: Text(item),
+          value: item,
+        ),
+      );
+    }
+    DropdownButton dropdownButton = DropdownButton<String>(
+        value: selectedCurrency,
+        items: dropDownItems,
+        onChanged: (value) {
+          setState(() {
+            selectedCurrency = value;
+          });
+        });
+    return dropdownButton;
+  }
+
+  Widget getDropDownItemsCupertino() {
+    List<Text> dropDownItemsCupertino = [];
+    for (String item in currenciesList) {
+      dropDownItemsCupertino.add(Text(
+        item,
+        style: TextStyle(color: Colors.white),
+      ));
+    }
+
+    CupertinoPicker cupertinoPicker = CupertinoPicker(
+      backgroundColor: Colors.blue[900],
+      itemExtent: 32,
+      onSelectedItemChanged: (value) {
+        setState(() {
+          selectedCurrencyCupertino = currenciesList[value];
+          print(value);
+        });
+      },
+      children: dropDownItemsCupertino,
+    );
+    return cupertinoPicker;
+  }
+
+  String selectedCurrency = 'USD';
+  String selectedCurrencyCupertino = 'USD';
   @override
+  //dropDownItems =
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('🤑 Coin Ticker'),
+        title: Text('Crypto Tracker'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -19,7 +70,7 @@ class _PriceScreenState extends State<PriceScreen> {
           Padding(
             padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
             child: Card(
-              color: Colors.lightBlueAccent,
+              color: Colors.blue[700],
               elevation: 5.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
@@ -41,8 +92,10 @@ class _PriceScreenState extends State<PriceScreen> {
             height: 150.0,
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
-            color: Colors.lightBlue,
-            child: null,
+            color: Colors.blue[900],
+            child: Platform.isIOS
+                ? getDropDownItemsCupertino()
+                : getAndroidDropdown(),
           ),
         ],
       ),
